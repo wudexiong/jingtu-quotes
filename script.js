@@ -2,6 +2,8 @@
 let quotes = [];
 let quoteCards = [];
 const teachers = ['印光大师', '净空法师', '其他大德'];
+let currentTemplate = 'classic'; // 当前选中的卡片模板
+let currentQuote = null; // 当前预览的语录
 
 // 语音相关变量
 let speechSynthesis = window.speechSynthesis;
@@ -57,7 +59,7 @@ function renderQuotes() {
     
     quotes.forEach((quote, index) => {
         const card = document.createElement('div');
-        card.className = 'quote-card';
+        card.className = `quote-card template-${currentTemplate}`;
         card.dataset.teacher = quote.teacher;
         card.style.animationDelay = `${index * 0.1}s`;
         
@@ -77,6 +79,13 @@ function renderQuotes() {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                         <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                </button>
+                <button class="share-btn" title="生成卡片" data-quote-text="${quote.text}" data-quote-author="${quote.teacher}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                 </button>
             </div>
@@ -99,6 +108,9 @@ function renderQuotes() {
     
     // 添加语录卡片点击事件（自动播放和自动复制）
     addCardClickEvents();
+    
+    // 添加卡片生成功能
+    addShareFunctionality();
 }
 
 // 添加复制功能
@@ -608,8 +620,123 @@ function addCardClickEvents() {
     });
 }
 
+// 添加模板选择功能
+function initTemplateSelector() {
+    const templateBtns = document.querySelectorAll('.template-btn');
+    
+    templateBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 移除所有按钮的 active 类
+            templateBtns.forEach(b => b.classList.remove('active'));
+            // 添加当前按钮的 active 类
+            btn.classList.add('active');
+            
+            // 更新当前模板
+            currentTemplate = btn.dataset.template;
+            
+            // 重新渲染卡片以应用新模板
+            renderQuotes();
+        });
+    });
+}
+
+// 添加卡片生成功能
+function addShareFunctionality() {
+    const shareBtns = document.querySelectorAll('.share-btn');
+    
+    shareBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止触发卡片点击事件
+            
+            const quoteText = btn.dataset.quoteText;
+            const quoteAuthor = btn.dataset.quoteAuthor;
+            
+            // 保存当前语录
+            currentQuote = { text: quoteText, author: quoteAuthor };
+            
+            // 显示模态框
+            showCardModal(quoteText, quoteAuthor);
+        });
+    });
+}
+
+// 显示卡片预览模态框
+function showCardModal(text, author) {
+    const modal = document.getElementById('card-modal');
+    const previewContainer = document.getElementById('card-preview');
+    
+    // 生成预览卡片
+    previewContainer.innerHTML = `
+        <div class="card-preview-card template-${currentTemplate}">
+            <div class="quote-content">
+                <p class="quote-text">${text}</p>
+                <p class="quote-author">— ${author}</p>
+            </div>
+        </div>
+    `;
+    
+    // 显示模态框
+    modal.classList.add('show');
+}
+
+// 关闭模态框
+function closeCardModal() {
+    const modal = document.getElementById('card-modal');
+    modal.classList.remove('show');
+}
+
+// 下载卡片为图片
+async function downloadCardAsImage() {
+    const previewCard = document.querySelector('.card-preview-card');
+    if (!previewCard || !currentQuote) return;
+    
+    try {
+        // 使用 html2canvas 将卡片转换为图片
+        const canvas = await html2canvas(previewCard, {
+            scale: 2, // 2倍缩放，提高清晰度
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null // 保持透明背景
+        });
+        
+        // 创建下载链接
+        const link = document.createElement('a');
+        link.download = `大德语录_${currentQuote.author}_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        // 显示成功提示
+        showCopySuccess(null);
+    } catch (error) {
+        console.error('生成图片失败:', error);
+        alert('生成图片失败，请重试');
+    }
+}
+
+// 初始化模态框事件
+function initModalEvents() {
+    const modal = document.getElementById('card-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    const downloadBtn = document.getElementById('download-card');
+    
+    // 点击关闭按钮
+    closeBtn.addEventListener('click', closeCardModal);
+    
+    // 点击模态框背景关闭
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeCardModal();
+        }
+    });
+    
+    // 下载按钮
+    downloadBtn.addEventListener('click', downloadCardAsImage);
+}
+
 // 初始化本地存储
 window.addEventListener('load', () => {
     initLocalStorage();
     initSpeechSettings();
+    initTemplateSelector();
+    initModalEvents();
 });

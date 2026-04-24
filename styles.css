@@ -64,6 +64,296 @@ header p {
     transform: scale(1.1);
 }
 
+/* 模板选择器样式 */
+.template-selector {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.template-selector h3 {
+    font-size: 16px;
+    color: #5a4b3c;
+    margin-bottom: 12px;
+}
+
+.template-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.template-btn {
+    padding: 8px 16px;
+    border: 1px solid #d0c6b6;
+    background-color: #f8f5f0;
+    color: #5a4b3c;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.template-btn:hover {
+    background-color: #e8e0d0;
+}
+
+.template-btn.active {
+    background-color: #5a4b3c;
+    color: #fff;
+    border-color: #5a4b3c;
+}
+
+/* 卡片模板样式 */
+.quote-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeIn 0.5s ease-in-out;
+    position: relative;
+}
+
+/* 经典雅致模板 */
+.quote-card.template-classic {
+    background: linear-gradient(135deg, #fdfbf7 0%, #f5efe6 100%);
+    border: 1px solid #e8dcc8;
+}
+
+.quote-card.template-classic .quote-text {
+    position: relative;
+    padding-left: 15px;
+    border-left: 3px solid #8b7355;
+}
+
+/* 现代简约模板 */
+.quote-card.template-modern {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+    border-left: 4px solid #4a90e2;
+}
+
+.quote-card.template-modern .quote-text {
+    font-family: 'Noto Sans SC', sans-serif;
+    color: #2c3e50;
+}
+
+/* 禅意水墨模板 */
+.quote-card.template-zen {
+    background: linear-gradient(135deg, #faf9f7 0%, #e9e5e0 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.quote-card.template-zen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(139, 115, 85, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.quote-card.template-zen .quote-text {
+    font-style: italic;
+    color: #4a4035;
+}
+
+/* 温馨温暖模板 */
+.quote-card.template-warm {
+    background: linear-gradient(135deg, #fff8f0 0%, #ffe8d0 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(210, 150, 100, 0.15);
+}
+
+.quote-card.template-warm .quote-text {
+    color: #7a4a2a;
+}
+
+.quote-card.template-warm .quote-author {
+    color: #a67c52;
+}
+
+/* 下载按钮 */
+.share-btn {
+    background-color: #f0e8d8;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #5a4b3c;
+    transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+    background-color: #4caf50;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* 模态框样式 */
+.card-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.card-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #5a4b3c;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.card-preview {
+    margin: 20px 0;
+    min-width: 300px;
+}
+
+.card-preview-card {
+    width: 400px;
+    min-height: 300px;
+    padding: 40px;
+    margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-actions {
+    text-align: center;
+}
+
+.download-btn {
+    padding: 12px 30px;
+    background-color: #5a4b3c;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    background-color: #4a3b2c;
+    transform: scale(1.05);
+}
+
+/* 预览卡片模板 */
+.card-preview-card.template-classic {
+    background: linear-gradient(135deg, #fdfbf7 0%, #f5efe6 100%);
+    border: 1px solid #e8dcc8;
+    border-radius: 12px;
+}
+
+.card-preview-card.template-classic .quote-text {
+    position: relative;
+    padding-left: 15px;
+    border-left: 3px solid #8b7355;
+    font-size: 20px;
+}
+
+.card-preview-card.template-modern {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+    border-left: 4px solid #4a90e2;
+    border-radius: 8px;
+}
+
+.card-preview-card.template-modern .quote-text {
+    font-family: 'Noto Sans SC', sans-serif;
+    color: #2c3e50;
+    font-size: 20px;
+}
+
+.card-preview-card.template-zen {
+    background: linear-gradient(135deg, #faf9f7 0%, #e9e5e0 100%);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-preview-card.template-zen::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(139, 115, 85, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.card-preview-card.template-zen .quote-text {
+    font-style: italic;
+    color: #4a4035;
+    font-size: 20px;
+}
+
+.card-preview-card.template-warm {
+    background: linear-gradient(135deg, #fff8f0 0%, #ffe8d0 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(210, 150, 100, 0.2);
+}
+
+.card-preview-card.template-warm .quote-text {
+    color: #7a4a2a;
+    font-size: 20px;
+}
+
+.card-preview-card .quote-author {
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+/* 响应式设计 - 预览卡片 */
+@media (max-width: 480px) {
+    .card-preview-card {
+        width: 100%;
+        padding: 30px;
+    }
+}
+
 /* 语音设置面板 */
 .speech-settings-panel {
     position: fixed;

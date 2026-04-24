@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>净土大德语录</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- html2canvas 库 - 用于导出图片 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -55,6 +57,17 @@
             </div>
         </div>
         
+        <!-- 卡片模板选择器 -->
+        <div class="template-selector">
+            <h3>选择卡片样式</h3>
+            <div class="template-options">
+                <button class="template-btn active" data-template="classic">经典雅致</button>
+                <button class="template-btn" data-template="modern">现代简约</button>
+                <button class="template-btn" data-template="zen">禅意水墨</button>
+                <button class="template-btn" data-template="warm">温馨温暖</button>
+            </div>
+        </div>
+        
         <div class="teacher-filter">
             <button class="filter-btn active" data-teacher="all">全部</button>
             <button class="filter-btn" data-teacher="印光大师">印光大师</button>
@@ -65,6 +78,17 @@
         <div class="quotes-container">
             <div class="loading">
                 <p>加载语录中...</p>
+            </div>
+        </div>
+        
+        <!-- 卡片预览模态框 -->
+        <div id="card-modal" class="card-modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="card-preview" class="card-preview"></div>
+                <div class="modal-actions">
+                    <button id="download-card" class="download-btn">下载图片</button>
+                </div>
             </div>
         </div>
         
