@@ -1,11 +1,7 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useQuoteCardStore } from '../store/quoteCardStore';
 
-interface CardPreviewProps {
-  ref: React.Ref<HTMLDivElement>;
-}
-
-const CardPreview: React.FC<CardPreviewProps> = ({ ref }) => {
+const CardPreview = React.forwardRef<HTMLDivElement>((props, ref) => {
   const { quotes, selectedTemplate, cardConfig, templates } = useQuoteCardStore();
   
   const currentTemplate = templates.find(t => t.id === selectedTemplate) || templates[0];
@@ -58,6 +54,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ ref }) => {
       </div>
     </div>
   );
-};
+});
+
+CardPreview.displayName = 'CardPreview';
 
 export default CardPreview;
