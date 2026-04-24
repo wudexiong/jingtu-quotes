@@ -1,14 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>语录卡片生成器</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>净土大德语录</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>净土大德语录</h1>
+            <p>一门深入，长时熏修</p>
+            <button id="speech-settings-btn" class="speech-settings-btn" title="设置">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- 语音设置面板 -->
+        <div id="speech-settings-panel" class="speech-settings-panel">
+            <div>
+                <h3>设置</h3>
+                <div class="setting-item">
+                    <label for="rate">语速</label>
+                    <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+                    <span id="rate-value">1.0</span>
+                </div>
+                <div class="setting-item">
+                    <label for="pitch">音调</label>
+                    <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+                    <span id="pitch-value">1.0</span>
+                </div>
+                <div class="setting-item">
+                    <label for="voice">音色</label>
+                    <select id="voice">
+                        <option value="">默认</option>
+                    </select>
+                </div>
+                <div class="setting-item checkbox-item">
+                    <label for="auto-play">
+                        <input type="checkbox" id="auto-play">
+                        点击语录自动播放
+                    </label>
+                </div>
+                <div class="setting-item checkbox-item">
+                    <label for="auto-copy">
+                        <input type="checkbox" id="auto-copy">
+                        点击语录自动复制
+                    </label>
+                </div>
+                <button id="close-settings-btn" class="close-settings-btn">关闭</button>
+            </div>
+        </div>
+        
+        <div class="teacher-filter">
+            <button class="filter-btn active" data-teacher="all">全部</button>
+            <button class="filter-btn" data-teacher="印光大师">印光大师</button>
+            <button class="filter-btn" data-teacher="净空法师">净空法师</button>
+            <button class="filter-btn" data-teacher="其他大德">其他大德</button>
+        </div>
+        
+        <div class="quotes-container">
+            <div class="loading">
+                <p>加载语录中...</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>愿以此功德，庄严佛净土</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
 </html>
