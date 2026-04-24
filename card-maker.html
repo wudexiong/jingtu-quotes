@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大德语录卡片制作 - 专业版</title>
+    <!-- Fabric.js - 强大的画布编辑库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* 左侧 - 模板选择 */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .section h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .templates {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .template {
+            aspect-ratio: 3/4;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .template:hover {
+            transform: scale(1.05);
+        }
+        
+        .template.active {
+            border-color: #667eea;
+        }
+        
+        /* 编辑工具 */
+        .tools {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+        
+        /* 文字编辑 */
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 中间 - 画布区域 */
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        #canvas-container {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        /* 右侧 - 语录选择 */
+        .quotes-panel {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .quote-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .quote-item {
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .quote-item:hover {
+            background: #f0f3ff;
+            border-color: #667eea;
+        }
+        
+        .quote-text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .quote-author {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+        
+        /* 操作提示 */
+        .tips {
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #856404;
+        }
+        
+        /* 返回链接 */
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .back-link:hover {
+            opacity: 1;
+        }
+        
+        /* 字体大小滑块 */
+        .font-size-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .font-size-control input[type="range"] {
+            flex: 1;
+        }
+        
+        .font-size-value {
+            min-width: 40px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 返回语录列表</a>
+        
+        <div class="header">
+            <h1>✨ 大德语录卡片制作</h1>
+            <p>专业级卡片设计工具 - 拖拽编辑、自由创作</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- 左侧 - 模板和编辑工具 -->
+            <div class="sidebar">
+                <div class="section">
+                    <h3>🎨 选择模板</h3>
+                    <div class="templates">
+                        <div class="template active" data-template="classic" style="background: linear-gradient(135deg, #fdfbf7 0%, #d4c4a8 100%);">经典</div>
+                        <div class="template" data-template="modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">现代</div>
+                        <div class="template" data-template="zen" style="background: linear-gradient(135deg, #e8e0d5 0%, #c4b89a 100%);">禅意</div>
+                        <div class="template" data-template="warm" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">温馨</div>
+                        <div class="template" data-template="dark" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);">深色</div>
+                        <div class="template" data-template="gradient" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">渐变</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>📝 编辑文字</h3>
+                    <div class="input-group">
+                        <label>语录内容</label>
+                        <textarea id="quoteContent" rows="4" placeholder="输入语录内容...">阿弥陀佛，佛光普照</textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>作者/出处</label>
+                        <input type="text" id="quoteAuthor" value="— 大德语录">
+                    </div>
+                    <button class="btn btn-primary" id="updateText">更新文字</button>
+                </div>
+                
+                <div class="section">
+                    <h3>🎭 文字样式</h3>
+                    <div class="input-group">
+                        <label>字体</label>
+                        <select id="fontFamily">
+                            <option value="Noto Serif SC, serif">宋体风格</option>
+                            <option value="Noto Sans SC, sans-serif">黑体风格</option>
+                            <option value="Ma Shan Zheng, cursive">书法风格</option>
+                            <option value="ZCOOL KuaiLe, cursive">可爱风格</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>字号</label>
+                        <div class="font-size-control">
+                            <input type="range" id="fontSize" min="20" max="60" value="32">
+                            <span class="font-size-value" id="fontSizeValue">32</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>文字颜色</label>
+                        <div class="color-options">
+                            <div class="color-option" style="background: #333333" data-color="#333333"></div>
+                            <div class="color-option" style="background: #666666" data-color="#666666"></div>
+                            <div class="color-option" style="background: #8b4513" data-color="#8b4513"></div>
+                            <div class="color-option" style="background: #ffffff" data-color="#ffffff"></div>
+                            <div class="color-option" style="background: #667eea" data-color="#667eea"></div>
+                            <div class="color-option" style="background: #ff6b6b" data-color="#ff6b6b"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>⚙️ 操作</h3>
+                    <div class="tools">
+                        <button class="btn btn-secondary" id="bringForward">↑ 上移一层</button>
+                        <button class="btn btn-secondary" id="sendBackward">↓ 下移一层</button>
+                        <button class="btn btn-secondary" id="deleteSelected">🗑️ 删除选中</button>
+                        <button class="btn btn-secondary" id="resetCanvas">🔄 重置画布</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <button class="btn btn-primary" style="width: 100%; font-size: 16px; padding: 15px;" id="downloadBtn">
+                        📥 下载图片
+                    </button>
+                </div>
+                
+                <div class="tips">
+                    💡 <strong>操作提示：</strong><br>
+                    • 点击元素可选中<br>
+                    • 拖拽可移动位置<br>
+                    • 拖动控制点可缩放旋转<br>
+                    • 双击文字可编辑
+                </div>
+            </div>
+            
+            <!-- 中间 - 画布区域 -->
+            <div class="canvas-area">
+                <div id="canvas-container">
+                    <canvas id="canvas" width="600" height="800"></canvas>
+                </div>
+            </div>
+            
+            <!-- 右侧 - 语录选择 -->
+            <div class="quotes-panel">
+                <div class="section">
+                    <h3>📚 快速选择语录</h3>
+                    <div class="quote-list" id="quoteList">
+                        <!-- 语录会动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let canvas;
+        let quoteTextObj;
+        let quoteAuthorObj;
+        let currentTemplate = 'classic';
+        
+        // 模板配置
+        const templates = {
+            classic: {
+                bg: 'linear-gradient(135deg, #fdfbf7 0%, #e8dcc8 100%)',
+                bgColor: '#fdfbf7',
+                textColor: '#333333'
+            },
+            modern: {
+                bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                bgColor: '#667eea',
+                textColor: '#ffffff'
+            },
+            zen: {
+                bg: 'linear-gradient(135deg, #e8e0d5 0%, #c9c0b0 100%)',
+                bgColor: '#e8e0d5',
+                textColor: '#4a4035'
+            },
+            warm: {
+                bg: 'linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%)',
+                bgColor: '#fff5eb',
+                textColor: '#7a4a2a'
+            },
+            dark: {
+                bg: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                bgColor: '#2c3e50',
+                textColor: '#ecf0f1'
+            },
+            gradient: {
+                bg: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                bgColor: '#a8edea',
+                textColor: '#2c3e50'
+            }
+        };
+        
+        // 初始化画布
+        function initCanvas() {
+            canvas = new fabric.Canvas('canvas', {
+                backgroundColor: '#fdfbf7',
+                selection: true
+            });
+            
+            // 创建初始文字
+            createQuoteText('阿弥陀佛，佛光普照', '#333333');
+            createQuoteAuthor('— 大德语录', '#666666');
+        }
+        
+        // 创建语录文字
+        function createQuoteText(text, color) {
+            quoteTextObj = new fabric.IText(text, {
+                left: 50,
+                top: 200,
+                fontFamily: 'Noto Serif SC, serif',
+                fontSize: 32,
+                fill: color,
+                textAlign: 'center',
+                selectable: true,
+                editable: true,
+                lineHeight: 1.8,
+                width: 500
+            });
+            canvas.add(quoteTextObj);
+        }
+        
+        // 创建作者文字
+        function createQuoteAuthor(text, color) {
+            quoteAuthorObj = new fabric.IText(text, {
+                left: 50,
+                top: 550,
+                fontFamily: 'Noto Serif SC, serif',
+                fontSize: 20,
+                fill: color,
+                textAlign: 'right',
+                selectable: true,
+                editable: true
+            });
+            canvas.add(quoteAuthorObj);
+        }
+        
+        // 应用模板
+        function applyTemplate(templateName) {
+            const template = templates[templateName];
+            if (!template) return;
+            
+            // 设置背景
+            canvas.setBackgroundColor(template.bgColor, canvas.renderAll.bind(canvas));
+            
+            // 更新文字颜色
+            if (quoteTextObj) {
+                quoteTextObj.set('fill', template.textColor);
+            }
+            if (quoteAuthorObj) {
+                const authorColor = template.textColor === '#ffffff' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.5)';
+                quoteAuthorObj.set('fill', authorColor);
+            }
+            
+            canvas.renderAll();
+        }
+        
+        // 更新文字内容
+        function updateText() {
+            const content = document.getElementById('quoteContent').value;
+            const author = document.getElementById('quoteAuthor').value;
+            
+            if (quoteTextObj) {
+                quoteTextObj.setText(content);
+            }
+            if (quoteAuthorObj) {
+                quoteAuthorObj.setText(author);
+            }
+            
+            canvas.renderAll();
+        }
+        
+        // 下载图片
+        function downloadImage() {
+            const dataURL = canvas.toDataURL({
+                format: 'png',
+                quality: 1
+            });
+            
+            const link = document.createElement('a');
+            link.download = `大德语录卡片_${Date.now()}.png`;
+            link.href = dataURL;
+            link.click();
+        }
+        
+        // 加载语录
+        async function loadQuotes() {
+            const teachers = ['印光大师', '净空法师', '其他大德'];
+            const allQuotes = [];
+            
+            for (const teacher of teachers) {
+                try {
+                    const response = await fetch(`${teacher}.txt`);
+                    const text = await response.text();
+                    const lines = text.trim().split('\n').filter(line => line.trim());
+                    lines.forEach(line => {
+                        allQuotes.push({ text: line.trim(), teacher: teacher });
+                    });
+                } catch (e) {
+                    console.log(`加载 ${teacher} 失败`);
+                }
+            }
+            
+            // 显示语录
+            const quoteList = document.getElementById('quoteList');
+            allQuotes.forEach((quote, index) => {
+                const item = document.createElement('div');
+                item.className = 'quote-item';
+                item.innerHTML = `
+                    <div class="quote-text">${quote.text}</div>
+                    <div class="quote-author">— ${quote.teacher}</div>
+                `;
+                item.addEventListener('click', () => {
+                    document.getElementById('quoteContent').value = quote.text;
+                    document.getElementById('quoteAuthor').value = `— ${quote.teacher}`;
+                    updateText();
+                });
+                quoteList.appendChild(item);
+            });
+        }
+        
+        // 初始化事件
+        function initEvents() {
+            // 模板选择
+            document.querySelectorAll('.template').forEach(template => {
+                template.addEventListener('click', () => {
+                    document.querySelectorAll('.template').forEach(t => t.classList.remove('active'));
+                    template.classList.add('active');
+                    currentTemplate = template.dataset.template;
+                    applyTemplate(currentTemplate);
+                });
+            });
+            
+            // 更新文字
+            document.getElementById('updateText').addEventListener('click', updateText);
+            
+            // 下载按钮
+            document.getElementById('downloadBtn').addEventListener('click', downloadImage);
+            
+            // 字体选择
+            document.getElementById('fontFamily').addEventListener('change', (e) => {
+                const activeObj = canvas.getActiveObject();
+                if (activeObj && activeObj.type === 'i-text') {
+                    activeObj.set('fontFamily', e.target.value);
+                    canvas.renderAll();
+                } else if (quoteTextObj) {
+                    quoteTextObj.set('fontFamily', e.target.value);
+                    canvas.renderAll();
+                }
+            });
+            
+            // 字号滑块
+            document.getElementById('fontSize').addEventListener('input', (e) => {
+                document.getElementById('fontSizeValue').textContent = e.target.value;
+                const activeObj = canvas.getActiveObject();
+                if (activeObj && activeObj.type === 'i-text') {
+                    activeObj.set('fontSize', parseInt(e.target.value));
+                    canvas.renderAll();
+                } else if (quoteTextObj) {
+                    quoteTextObj.set('fontSize', parseInt(e.target.value));
+                    canvas.renderAll();
+                }
+            });
+            
+            // 颜色选择
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const color = option.dataset.color;
+                    const activeObj = canvas.getActiveObject();
+                    if (activeObj && activeObj.type === 'i-text') {
+                        activeObj.set('fill', color);
+                        canvas.renderAll();
+                    } else if (quoteTextObj) {
+                        quoteTextObj.set('fill', color);
+                        canvas.renderAll();
+                    }
+                });
+            });
+            
+            // 图层操作
+            document.getElementById('bringForward').addEventListener('click', () => {
+                const activeObj = canvas.getActiveObject();
+                if (activeObj) {
+                    activeObj.bringForward();
+                    canvas.renderAll();
+                }
+            });
+            
+            document.getElementById('sendBackward').addEventListener('click', () => {
+                const activeObj = canvas.getActiveObject();
+                if (activeObj) {
+                    activeObj.sendBackwards();
+                    canvas.renderAll();
+                }
+            });
+            
+            document.getElementById('deleteSelected').addEventListener('click', () => {
+                const activeObj = canvas.getActiveObject();
+                if (activeObj) {
+                    canvas.remove(activeObj);
+                }
+            });
+            
+            document.getElementById('resetCanvas').addEventListener('click', () => {
+                if (confirm('确定要重置画布吗？')) {
+                    canvas.clear();
+                    createQuoteText('阿弥陀佛，佛光普照', templates[currentTemplate].textColor);
+                    createQuoteAuthor('— 大德语录', 'rgba(0,0,0,0.5)');
+                    applyTemplate(currentTemplate);
+                }
+            });
+        }
+        
+        // 页面加载完成
+        window.addEventListener('load', () => {
+            initCanvas();
+            initEvents();
+            loadQuotes();
+        });
+    </script>
+</body>
+</html>
