@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>大德语录卡片</title>
+    <title>语录卡片</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <style>
         * {
@@ -13,212 +13,349 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            padding: 12px;
-            overflow-x: hidden;
+            background: #1a1a1a;
+            position: relative;
         }
         
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        /* 顶部导航 */
-        .header {
+        /* 顶部工具栏 */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 55px;
+            background: rgba(30,30,30,0.95);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            padding: 0 15px;
+            z-index: 100;
         }
         
-        .back-link {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
+        .top-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
         
-        .header h1 {
-            font-size: 17px;
-            color: #333;
+        .top-btn:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .title {
+            color: #fff;
+            font-size: 16px;
             font-weight: 600;
         }
         
-        /* 模板选择 */
-        .template-selector {
+        /* 画布容器 */
+        .canvas-container-wrapper {
+            position: absolute;
+            top: 55px;
+            left: 0;
+            right: 0;
+            bottom: 70px;
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            overflow-x: auto;
-            padding: 2px 0;
-            -webkit-overflow-scrolling: touch;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
         }
         
-        .template-selector::-webkit-scrollbar {
+        #canvas-container {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        
+        /* 底部工具栏 */
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(30,30,30,0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 15px;
+            z-index: 100;
+        }
+        
+        .bottom-btn {
+            flex: 1;
+            height: 48px;
+            border-radius: 14px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        
+        .bottom-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        
+        .bottom-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        
+        .bottom-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 元素工具栏（浮在选中元素旁边） */
+        .element-toolbar {
+            position: fixed;
+            background: rgba(40,40,40,0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 6px;
             display: none;
+            gap: 4px;
+            z-index: 200;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
         
-        .template-item {
-            flex-shrink: 0;
-            width: 50px;
-            height: 65px;
-            border-radius: 8px;
+        .element-toolbar.show {
+            display: flex;
+        }
+        
+        .element-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .element-btn:hover,
+        .element-btn:active {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: flex-end;
+            z-index: 500;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            width: 100%;
+            background: #2a2a2a;
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* 模板选择 */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .template-card {
+            aspect-ratio: 3/4;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        
+        .template-card.active {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        
+        /* 颜色选择 */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+        }
+        
+        .color-item {
+            aspect-ratio: 1;
+            border-radius: 50%;
             cursor: pointer;
             border: 3px solid transparent;
             transition: all 0.2s;
         }
         
-        .template-item.active {
-            border-color: #667eea;
-            transform: scale(1.05);
+        .color-item.active {
+            border-color: #fff;
+            transform: scale(1.1);
         }
         
-        .template-item.template-classic { background: linear-gradient(135deg, #fdfbf7 0%, #e8dcc8 100%); }
-        .template-item.template-modern { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .template-item.template-zen { background: linear-gradient(135deg, #e8e0d5 0%, #c9c0b0 100%); }
-        .template-item.template-warm { background: linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%); }
-        .template-item.template-dark { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
-        
-        /* 画布容器 */
-        .canvas-wrapper {
-            background: #fff;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        }
-        
-        #canvas-container {
-            width: 100%;
-            aspect-ratio: 3/4;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .hint-text {
-            text-align: center;
-            font-size: 11px;
-            color: #999;
-            margin-top: 8px;
-        }
-        
-        /* 语录选择 */
-        .quotes-section {
-            background: #fff;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-        
-        .quotes-section h3 {
-            font-size: 13px;
-            color: #333;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .quotes-list {
+        /* 语录列表 */
+        .quotes-list-modal {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 120px;
-            overflow-y: auto;
-        }
-        
-        .quote-option {
-            padding: 10px 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
-        
-        .quote-option:active {
-            background: #f0f3ff;
-            border-color: #667eea;
-        }
-        
-        .quote-option small {
-            display: block;
-            color: #999;
-            margin-top: 4px;
-            font-size: 11px;
-        }
-        
-        /* 底部按钮 */
-        .bottom-bar {
-            display: flex;
             gap: 10px;
         }
         
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
+        .quote-item-modal {
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.08);
             border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
+            color: #fff;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .btn-download {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+        .quote-item-modal:active {
+            background: rgba(255,255,255,0.12);
         }
         
-        .btn-download:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-reset {
-            background: #f0f0f0;
-            color: #666;
+        .quote-item-modal small {
+            display: block;
+            color: #999;
+            margin-top: 6px;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-link">← 返回</a>
-            <h1>语录卡片</h1>
-            <div style="width:40px"></div>
+    <!-- 顶部栏 -->
+    <div class="top-bar">
+        <button class="top-btn" id="backBtn">←</button>
+        <span class="title">语录卡片</span>
+        <button class="top-btn" id="addBtn">+</button>
+    </div>
+    
+    <!-- 画布区域 -->
+    <div class="canvas-container-wrapper">
+        <div id="canvas-container">
+            <canvas id="canvas"></canvas>
         </div>
-        
-        <!-- 模板选择 -->
-        <div class="template-selector">
-            <div class="template-item template-classic active" data-template="classic"></div>
-            <div class="template-item template-modern" data-template="modern"></div>
-            <div class="template-item template-zen" data-template="zen"></div>
-            <div class="template-item template-warm" data-template="warm"></div>
-            <div class="template-item template-dark" data-template="dark"></div>
-        </div>
-        
-        <!-- 画布 -->
-        <div class="canvas-wrapper">
-            <div id="canvas-container">
-                <canvas id="canvas"></canvas>
+    </div>
+    
+    <!-- 元素工具栏 -->
+    <div class="element-toolbar" id="elementToolbar">
+        <button class="element-btn" id="editBtn">✏️</button>
+        <button class="element-btn" id="layerUpBtn">↑</button>
+        <button class="element-btn" id="layerDownBtn">↓</button>
+        <button class="element-btn" id="duplicateBtn">📋</button>
+        <button class="element-btn" id="deleteBtn">🗑️</button>
+    </div>
+    
+    <!-- 底部栏 -->
+    <div class="bottom-bar">
+        <button class="bottom-btn secondary" id="templateBtn">🎨 模板</button>
+        <button class="bottom-btn secondary" id="quoteBtn">📝 语录</button>
+        <button class="bottom-btn primary" id="saveBtn">📥 保存</button>
+    </div>
+    
+    <!-- 模板弹窗 -->
+    <div class="modal-overlay" id="templateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">选择模板</span>
+                <button class="modal-close" id="closeTemplateModal">×</button>
             </div>
-            <p class="hint-text">💡 双击文字可编辑，拖动可移动/缩放</p>
+            <div class="template-grid" id="templateGrid">
+                <div class="template-card active" data-template="classic" style="background: linear-gradient(135deg, #fdfbf7 0%, #e8dcc8 100%);"></div>
+                <div class="template-card" data-template="modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                <div class="template-card" data-template="zen" style="background: linear-gradient(135deg, #e8e0d5 0%, #c9c0b0 100%);"></div>
+                <div class="template-card" data-template="warm" style="background: linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%);"></div>
+                <div class="template-card" data-template="dark" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);"></div>
+                <div class="template-card" data-template="gradient" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>
+            </div>
         </div>
-        
-        <!-- 语录选择 -->
-        <div class="quotes-section">
-            <h3>选择语录</h3>
-            <div class="quotes-list" id="quotesList"></div>
-        </div>
-        
-        <!-- 底部按钮 -->
-        <div class="bottom-bar">
-            <button class="btn btn-reset" id="resetBtn">重置</button>
-            <button class="btn btn-download" id="downloadBtn">保存图片</button>
+    </div>
+    
+    <!-- 语录弹窗 -->
+    <div class="modal-overlay" id="quoteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">选择语录</span>
+                <button class="modal-close" id="closeQuoteModal">×</button>
+            </div>
+            <div class="quotes-list-modal" id="quotesListModal"></div>
         </div>
     </div>
     
@@ -227,18 +364,21 @@
         let quoteTextObj;
         let quoteAuthorObj;
         let currentTemplate = 'classic';
+        let activeObject = null;
         
         const templates = {
             classic: { bgColor: '#fdfbf7', textColor: '#333', authorColor: '#666' },
             modern: { bgColor: '#667eea', textColor: '#fff', authorColor: 'rgba(255,255,255,0.8)' },
             zen: { bgColor: '#e8e0d5', textColor: '#4a4035', authorColor: 'rgba(74,64,53,0.6)' },
             warm: { bgColor: '#fff5eb', textColor: '#7a4a2a', authorColor: '#a67c52' },
-            dark: { bgColor: '#2c3e50', textColor: '#fff', authorColor: 'rgba(255,255,255,0.8)' }
+            dark: { bgColor: '#2c3e50', textColor: '#fff', authorColor: 'rgba(255,255,255,0.8)' },
+            gradient: { bgColor: '#a8edea', textColor: '#2c3e50', authorColor: '#555' }
         };
         
         function initCanvas() {
-            const container = document.getElementById('canvas-container');
-            const width = container.clientWidth;
+            const container = document.getElementById('canvas-container-wrapper');
+            const maxWidth = Math.min(container.clientWidth - 40, 360);
+            const width = maxWidth;
             const height = width * 4 / 3;
             
             canvas = new fabric.Canvas('canvas', {
@@ -250,7 +390,7 @@
             quoteTextObj = new fabric.IText('阿弥陀佛，佛光普照', {
                 left: 25,
                 top: height * 0.3,
-                fontSize: 34,
+                fontSize: 32,
                 fill: templates.classic.textColor,
                 textAlign: 'center',
                 fontFamily: '"Noto Serif SC", serif',
@@ -272,40 +412,132 @@
             
             canvas.add(quoteTextObj);
             canvas.add(quoteAuthorObj);
+            
+            canvas.on('object:selected', (e) => {
+                activeObject = e.target;
+                showElementToolbar(e.target);
+            });
+            
+            canvas.on('selection:cleared', () => {
+                activeObject = null;
+                hideElementToolbar();
+            });
+            
+            canvas.on('object:modified', () => {
+                if (activeObject) {
+                    showElementToolbar(activeObject);
+                }
+            });
         }
         
-        document.querySelectorAll('.template-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                currentTemplate = item.dataset.template;
+        function showElementToolbar(obj) {
+            const toolbar = document.getElementById('elementToolbar');
+            toolbar.classList.add('show');
+            positionToolbar(obj);
+        }
+        
+        function positionToolbar(obj) {
+            const toolbar = document.getElementById('elementToolbar');
+            const canvasEl = document.getElementById('canvas-container');
+            const rect = canvasEl.getBoundingClientRect();
+            const objCoords = obj.getCenterPoint();
+            
+            toolbar.style.left = rect.left + objCoords.x - toolbar.offsetWidth / 2 + 'px';
+            toolbar.style.top = rect.top + objCoords.y - obj.height - 60 + 'px';
+        }
+        
+        function hideElementToolbar() {
+            document.getElementById('elementToolbar').classList.remove('show');
+        }
+        
+        // 模板弹窗
+        document.getElementById('templateBtn').addEventListener('click', () => {
+            document.getElementById('templateModal').classList.add('show');
+        });
+        
+        document.getElementById('closeTemplateModal').addEventListener('click', () => {
+            document.getElementById('templateModal').classList.remove('show');
+        });
+        
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                currentTemplate = card.dataset.template;
                 const t = templates[currentTemplate];
                 
                 canvas.setBackgroundColor(t.bgColor, canvas.renderAll.bind(canvas));
                 quoteTextObj.set('fill', t.textColor);
                 quoteAuthorObj.set('fill', t.authorColor);
                 canvas.renderAll();
+                
+                document.getElementById('templateModal').classList.remove('show');
             });
         });
         
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            if (confirm('确定要重置吗？')) {
-                canvas.clear();
-                initCanvas();
-                document.querySelector('.template-item').classList.add('active');
+        // 语录弹窗
+        document.getElementById('quoteBtn').addEventListener('click', () => {
+            document.getElementById('quoteModal').classList.add('show');
+        });
+        
+        document.getElementById('closeQuoteModal').addEventListener('click', () => {
+            document.getElementById('quoteModal').classList.remove('show');
+        });
+        
+        // 元素工具栏
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            if (activeObject) {
+                canvas.remove(activeObject);
+                hideElementToolbar();
             }
         });
         
-        document.getElementById('downloadBtn').addEventListener('click', () => {
+        document.getElementById('layerUpBtn').addEventListener('click', () => {
+            if (activeObject) {
+                activeObject.bringForward();
+                canvas.renderAll();
+            }
+        });
+        
+        document.getElementById('layerDownBtn').addEventListener('click', () => {
+            if (activeObject) {
+                activeObject.sendBackwards();
+                canvas.renderAll();
+            }
+        });
+        
+        document.getElementById('duplicateBtn').addEventListener('click', () => {
+            if (activeObject) {
+                activeObject.clone((clone) => {
+                    clone.set({
+                        left: activeObject.left + 20,
+                        top: activeObject.top + 20
+                    });
+                    canvas.add(clone);
+                    canvas.setActiveObject(clone);
+                    activeObject = clone;
+                    canvas.renderAll();
+                });
+            }
+        });
+        
+        // 保存
+        document.getElementById('saveBtn').addEventListener('click', () => {
             canvas.discardActiveObject();
             canvas.renderAll();
             const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
             const link = document.createElement('a');
-            link.download = `大德语录_${Date.now()}.png`;
+            link.download = `语录卡片_${Date.now()}.png`;
             link.href = dataURL;
             link.click();
         });
         
+        // 返回
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        
+        // 加载语录
         async function loadQuotes() {
             const teachers = ['印光大师', '净空法师', '其他大德'];
             const allQuotes = [];
@@ -320,19 +552,29 @@
                 } catch (e) {}
             }
             
-            const list = document.getElementById('quotesList');
+            const list = document.getElementById('quotesListModal');
             allQuotes.forEach(quote => {
                 const item = document.createElement('div');
-                item.className = 'quote-option';
+                item.className = 'quote-item-modal';
                 item.innerHTML = `${quote.text}<small>— ${quote.teacher}</small>`;
                 item.addEventListener('click', () => {
                     quoteTextObj.setText(quote.text);
                     quoteAuthorObj.setText(`— ${quote.teacher}`);
                     canvas.renderAll();
+                    document.getElementById('quoteModal').classList.remove('show');
                 });
                 list.appendChild(item);
             });
         }
+        
+        // 点击遮罩关闭弹窗
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('show');
+                }
+            });
+        });
         
         initCanvas();
         loadQuotes();
