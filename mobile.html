@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>大德语录卡片</title>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -18,6 +18,7 @@
             background: #f5f5f5;
             min-height: 100vh;
             padding: 15px;
+            overflow-x: hidden;
         }
         
         .container {
@@ -36,92 +37,67 @@
             font-weight: 600;
         }
         
-        /* 卡片预览区域 */
-        .card-preview-wrapper {
+        /* 画布容器 */
+        .canvas-wrapper {
             background: #fff;
             border-radius: 16px;
-            padding: 20px;
+            padding: 15px;
             margin-bottom: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         
-        .card {
+        #canvas-container {
             width: 100%;
             aspect-ratio: 3/4;
             border-radius: 12px;
-            padding: 30px 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
             overflow: hidden;
         }
         
-        /* 模板样式 */
-        .card.template-classic {
-            background: linear-gradient(135deg, #fdfbf7 0%, #e8dcc8 100%);
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding: 2px 0;
+            -webkit-overflow-scrolling: touch;
         }
         
-        .card.template-modern {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .toolbar::-webkit-scrollbar {
+            display: none;
         }
         
-        .card.template-zen {
-            background: linear-gradient(135deg, #e8e0d5 0%, #c9c0b0 100%);
-        }
-        
-        .card.template-warm {
-            background: linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%);
-        }
-        
-        .card.template-dark {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        }
-        
-        .card-text {
-            font-size: 20px;
-            line-height: 1.8;
-            text-align: center;
-            color: #333;
-            font-family: "Noto Serif SC", serif;
-        }
-        
-        .card-author {
+        .tool-btn {
+            flex-shrink: 0;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 20px;
             font-size: 14px;
-            text-align: right;
-            color: #666;
-            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
-        .card.template-modern .card-text,
-        .card.template-dark .card-text {
+        .tool-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .tool-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-        }
-        
-        .card.template-modern .card-author,
-        .card.template-dark .card-author {
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .card.template-warm .card-text {
-            color: #7a4a2a;
-        }
-        
-        .card.template-warm .card-author {
-            color: #a67c52;
-        }
-        
-        .card.template-zen .card-text {
-            color: #4a4035;
+            border-color: transparent;
         }
         
         /* 模板选择 */
         .template-selector {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             overflow-x: auto;
-            padding: 5px 0;
+            padding: 2px 0;
             -webkit-overflow-scrolling: touch;
         }
         
@@ -131,8 +107,8 @@
         
         .template-item {
             flex-shrink: 0;
-            width: 70px;
-            height: 90px;
+            width: 60px;
+            height: 80px;
             border-radius: 10px;
             cursor: pointer;
             border: 3px solid transparent;
@@ -164,49 +140,117 @@
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         }
         
-        /* 文字编辑区域 */
-        .editor-section {
+        /* 文字编辑弹窗 */
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: flex-end;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .edit-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .edit-panel {
+            width: 100%;
             background: #fff;
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            padding: 25px 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .edit-modal.show .edit-panel {
+            transform: translateY(0);
+        }
+        
+        .edit-panel h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .edit-section {
             margin-bottom: 15px;
         }
         
-        .editor-section textarea,
-        .editor-section input {
+        .edit-section label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .edit-section textarea {
             width: 100%;
             border: 1px solid #eee;
             border-radius: 10px;
             padding: 12px 15px;
             font-size: 15px;
             resize: none;
-            outline: none;
-            transition: border-color 0.2s;
+            min-height: 100px;
         }
         
-        .editor-section textarea:focus,
-        .editor-section input:focus {
+        .edit-section input[type="range"] {
+            width: 100%;
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .color-option.active {
             border-color: #667eea;
         }
         
-        .editor-section textarea {
-            min-height: 100px;
-            line-height: 1.6;
+        .edit-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
         }
         
-        .editor-label {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 8px;
-            display: block;
+        .edit-buttons .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
         }
         
-        .input-group {
-            margin-bottom: 15px;
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
         }
         
-        .input-group:last-child {
-            margin-bottom: 0;
+        .btn-confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
         }
         
         /* 语录选择 */
@@ -228,7 +272,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 200px;
+            max-height: 150px;
             overflow-y: auto;
         }
         
@@ -243,7 +287,7 @@
             border: 2px solid transparent;
         }
         
-        .quote-option:hover {
+        .quote-option:active {
             background: #f0f3ff;
             border-color: #667eea;
         }
@@ -298,6 +342,14 @@
             margin-bottom: 15px;
             font-weight: 500;
         }
+        
+        /* 提示文字 */
+        .hint-text {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -308,14 +360,11 @@
             <h1>大德语录卡片</h1>
         </div>
         
-        <!-- 卡片预览 -->
-        <div class="card-preview-wrapper">
-            <div id="card" class="card template-classic">
-                <div class="card-content">
-                    <p class="card-text" id="cardText">阿弥陀佛，佛光普照</p>
-                </div>
-                <p class="card-author" id="cardAuthor">— 大德语录</p>
-            </div>
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="tool-btn" id="editTextBtn">✏️ 编辑文字</div>
+            <div class="tool-btn" id="resetBtn">🔄 重置</div>
+            <div class="tool-btn" id="deleteBtn">🗑️ 删除</div>
         </div>
         
         <!-- 模板选择 -->
@@ -327,16 +376,12 @@
             <div class="template-item template-dark" data-template="dark"></div>
         </div>
         
-        <!-- 文字编辑 -->
-        <div class="editor-section">
-            <div class="input-group">
-                <label class="editor-label">语录内容</label>
-                <textarea id="quoteInput" placeholder="输入语录内容...">阿弥陀佛，佛光普照</textarea>
+        <!-- 画布 -->
+        <div class="canvas-wrapper">
+            <div id="canvas-container">
+                <canvas id="canvas"></canvas>
             </div>
-            <div class="input-group">
-                <label class="editor-label">作者</label>
-                <input type="text" id="authorInput" value="— 大德语录">
-            </div>
+            <p class="hint-text">💡 点击文字可拖拽、缩放</p>
         </div>
         
         <!-- 语录选择 -->
@@ -354,47 +399,198 @@
         </div>
     </div>
     
+    <!-- 编辑弹窗 -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-panel">
+            <h3>编辑文字</h3>
+            <div class="edit-section">
+                <label>语录内容</label>
+                <textarea id="editTextInput">阿弥陀佛，佛光普照</textarea>
+            </div>
+            <div class="edit-section">
+                <label>字体大小: <span id="sizeValue">36</span>px</label>
+                <input type="range" id="editSizeInput" min="20" max="60" value="36">
+            </div>
+            <div class="edit-section">
+                <label>文字颜色</label>
+                <div class="color-options">
+                    <div class="color-option active" style="background: #333" data-color="#333"></div>
+                    <div class="color-option" style="background: #667eea" data-color="#667eea"></div>
+                    <div class="color-option" style="background: #fff; border: 1px solid #eee;" data-color="#fff"></div>
+                    <div class="color-option" style="background: #8b4513" data-color="#8b4513"></div>
+                    <div class="color-option" style="background: #ff6b6b" data-color="#ff6b6b"></div>
+                </div>
+            </div>
+            <div class="edit-buttons">
+                <button class="btn btn-cancel" id="cancelEdit">取消</button>
+                <button class="btn btn-confirm" id="confirmEdit">确定</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
+        let canvas;
+        let quoteTextObj;
+        let quoteAuthorObj;
         let currentTemplate = 'classic';
+        let currentColor = '#333';
         
-        // 模板选择
+        // 模板配置
+        const templates = {
+            classic: { bgColor: '#fdfbf7' },
+            modern: { bgColor: '#667eea' },
+            zen: { bgColor: '#e8e0d5' },
+            warm: { bgColor: '#fff5eb' },
+            dark: { bgColor: '#2c3e50' }
+        };
+        
+        // 初始化画布
+        function initCanvas() {
+            const container = document.getElementById('canvas-container');
+            const width = container.clientWidth;
+            const height = width * 4 / 3;
+            
+            canvas = new fabric.Canvas('canvas', {
+                width: width,
+                height: height,
+                backgroundColor: templates.classic.bgColor
+            });
+            
+            // 创建语录文字
+            quoteTextObj = new fabric.IText('阿弥陀佛，佛光普照', {
+                left: 30,
+                top: height * 0.3,
+                fontSize: 36,
+                fill: '#333',
+                textAlign: 'center',
+                fontFamily: '"Noto Serif SC", serif',
+                selectable: true,
+                editable: true,
+                lineHeight: 1.6
+            });
+            
+            // 创建作者文字
+            quoteAuthorObj = new fabric.IText('— 大德语录', {
+                left: width - 120,
+                top: height - 80,
+                fontSize: 20,
+                fill: '#666',
+                textAlign: 'right',
+                selectable: true,
+                editable: true,
+                fontFamily: '"Noto Serif SC", serif'
+            });
+            
+            canvas.add(quoteTextObj);
+            canvas.add(quoteAuthorObj);
+            canvas.setActiveObject(quoteTextObj);
+        }
+        
+        // 应用模板
         document.querySelectorAll('.template-item').forEach(item => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
                 currentTemplate = item.dataset.template;
                 
-                const card = document.getElementById('card');
-                card.className = `card template-${currentTemplate}`;
+                canvas.setBackgroundColor(templates[currentTemplate].bgColor, canvas.renderAll.bind(canvas));
+                
+                // 根据模板调整文字颜色
+                if (currentTemplate === 'modern' || currentTemplate === 'dark') {
+                    quoteTextObj.set('fill', '#fff');
+                    quoteAuthorObj.set('fill', 'rgba(255,255,255,0.8)');
+                } else if (currentTemplate === 'warm') {
+                    quoteTextObj.set('fill', '#7a4a2a');
+                    quoteAuthorObj.set('fill', '#a67c52');
+                } else if (currentTemplate === 'zen') {
+                    quoteTextObj.set('fill', '#4a4035');
+                    quoteAuthorObj.set('fill', 'rgba(74,64,53,0.6)');
+                } else {
+                    quoteTextObj.set('fill', '#333');
+                    quoteAuthorObj.set('fill', '#666');
+                }
+                
+                canvas.renderAll();
             });
         });
         
-        // 更新文字
-        document.getElementById('quoteInput').addEventListener('input', () => {
-            document.getElementById('cardText').textContent = document.getElementById('quoteInput').value;
+        // 编辑按钮
+        document.getElementById('editTextBtn').addEventListener('click', () => {
+            const activeObj = canvas.getActiveObject();
+            if (activeObj && (activeObj === quoteTextObj || activeObj === quoteAuthorObj)) {
+                document.getElementById('editTextInput').value = activeObj.text;
+                document.getElementById('editSizeInput').value = activeObj.fontSize;
+                document.getElementById('sizeValue').textContent = activeObj.fontSize;
+                document.getElementById('editModal').classList.add('show');
+            } else {
+                alert('请先点击选中要编辑的文字');
+                canvas.setActiveObject(quoteTextObj);
+            }
         });
         
-        document.getElementById('authorInput').addEventListener('input', () => {
-            document.getElementById('cardAuthor').textContent = document.getElementById('authorInput').value;
+        // 字体大小
+        document.getElementById('editSizeInput').addEventListener('input', (e) => {
+            document.getElementById('sizeValue').textContent = e.target.value;
+        });
+        
+        // 颜色选择
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                currentColor = option.dataset.color;
+            });
+        });
+        
+        // 确认编辑
+        document.getElementById('confirmEdit').addEventListener('click', () => {
+            const activeObj = canvas.getActiveObject();
+            if (activeObj) {
+                activeObj.setText(document.getElementById('editTextInput').value);
+                activeObj.set('fontSize', parseInt(document.getElementById('editSizeInput').value));
+                activeObj.set('fill', currentColor);
+                canvas.renderAll();
+            }
+            document.getElementById('editModal').classList.remove('show');
+        });
+        
+        // 取消编辑
+        document.getElementById('cancelEdit').addEventListener('click', () => {
+            document.getElementById('editModal').classList.remove('show');
+        });
+        
+        // 重置画布
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm('确定要重置吗？')) {
+                canvas.clear();
+                initCanvas();
+                document.querySelector('.template-item').classList.add('active');
+            }
+        });
+        
+        // 删除选中
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            const activeObj = canvas.getActiveObject();
+            if (activeObj) {
+                canvas.remove(activeObj);
+            }
         });
         
         // 下载图片
-        document.getElementById('downloadBtn').addEventListener('click', async () => {
-            const card = document.getElementById('card');
-            try {
-                const canvas = await html2canvas(card, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: null
-                });
-                
-                const link = document.createElement('a');
-                link.download = `大德语录_${Date.now()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            } catch (e) {
-                alert('保存失败，请重试');
-            }
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            // 先取消选中
+            canvas.discardActiveObject();
+            canvas.renderAll();
+            
+            const dataURL = canvas.toDataURL({
+                format: 'png',
+                quality: 1
+            });
+            
+            const link = document.createElement('a');
+            link.download = `大德语录_${Date.now()}.png`;
+            link.href = dataURL;
+            link.click();
         });
         
         // 加载语录
@@ -422,15 +618,16 @@
                 item.className = 'quote-option';
                 item.innerHTML = `${quote.text}<small>— ${quote.teacher}</small>`;
                 item.addEventListener('click', () => {
-                    document.getElementById('quoteInput').value = quote.text;
-                    document.getElementById('authorInput').value = `— ${quote.teacher}`;
-                    document.getElementById('cardText').textContent = quote.text;
-                    document.getElementById('cardAuthor').textContent = `— ${quote.teacher}`;
+                    quoteTextObj.setText(quote.text);
+                    quoteAuthorObj.setText(`— ${quote.teacher}`);
+                    canvas.renderAll();
                 });
                 list.appendChild(item);
             });
         }
         
+        // 初始化
+        initCanvas();
         loadQuotes();
     </script>
 </body>
