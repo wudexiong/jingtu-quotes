@@ -17,7 +17,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #f5f5f5;
             min-height: 100vh;
-            padding: 15px;
+            padding: 12px;
             overflow-x: hidden;
         }
         
@@ -26,76 +26,32 @@
             margin: 0 auto;
         }
         
+        /* 顶部导航 */
         .header {
-            text-align: center;
-            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
         }
         
         .header h1 {
-            font-size: 18px;
+            font-size: 17px;
             color: #333;
             font-weight: 600;
-        }
-        
-        /* 画布容器 */
-        .canvas-wrapper {
-            background: #fff;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        
-        #canvas-container {
-            width: 100%;
-            aspect-ratio: 3/4;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        /* 工具栏 */
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-            padding: 2px 0;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .toolbar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .tool-btn {
-            flex-shrink: 0;
-            padding: 10px 16px;
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .tool-btn:active {
-            transform: scale(0.98);
-        }
-        
-        .tool-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            border-color: transparent;
         }
         
         /* 模板选择 */
         .template-selector {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 12px;
             overflow-x: auto;
             padding: 2px 0;
             -webkit-overflow-scrolling: touch;
@@ -107,9 +63,9 @@
         
         .template-item {
             flex-shrink: 0;
-            width: 60px;
-            height: 80px;
-            border-radius: 10px;
+            width: 50px;
+            height: 65px;
+            border-radius: 8px;
             cursor: pointer;
             border: 3px solid transparent;
             transition: all 0.2s;
@@ -120,167 +76,63 @@
             transform: scale(1.05);
         }
         
-        .template-item.template-classic {
-            background: linear-gradient(135deg, #fdfbf7 0%, #e8dcc8 100%);
-        }
+        .template-item.template-classic { background: linear-gradient(135deg, #fdfbf7 0%, #e8dcc8 100%); }
+        .template-item.template-modern { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .template-item.template-zen { background: linear-gradient(135deg, #e8e0d5 0%, #c9c0b0 100%); }
+        .template-item.template-warm { background: linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%); }
+        .template-item.template-dark { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
         
-        .template-item.template-modern {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .template-item.template-zen {
-            background: linear-gradient(135deg, #e8e0d5 0%, #c9c0b0 100%);
-        }
-        
-        .template-item.template-warm {
-            background: linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%);
-        }
-        
-        .template-item.template-dark {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        }
-        
-        /* 文字编辑弹窗 */
-        .edit-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: flex-end;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .edit-modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .edit-panel {
-            width: 100%;
+        /* 画布容器 */
+        .canvas-wrapper {
             background: #fff;
-            border-radius: 20px 20px 0 0;
-            padding: 25px 20px;
-            max-height: 70vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
         
-        .edit-modal.show .edit-panel {
-            transform: translateY(0);
-        }
-        
-        .edit-panel h3 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .edit-section {
-            margin-bottom: 15px;
-        }
-        
-        .edit-section label {
-            display: block;
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-        
-        .edit-section textarea {
+        #canvas-container {
             width: 100%;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            padding: 12px 15px;
-            font-size: 15px;
-            resize: none;
-            min-height: 100px;
-        }
-        
-        .edit-section input[type="range"] {
-            width: 100%;
-        }
-        
-        .color-options {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.2s;
-        }
-        
-        .color-option.active {
-            border-color: #667eea;
-        }
-        
-        .edit-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .edit-buttons .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
+            aspect-ratio: 3/4;
             border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
+            overflow: hidden;
         }
         
-        .btn-cancel {
-            background: #f0f0f0;
-            color: #333;
-        }
-        
-        .btn-confirm {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+        .hint-text {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
         }
         
         /* 语录选择 */
         .quotes-section {
             background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
         }
         
         .quotes-section h3 {
-            font-size: 14px;
+            font-size: 13px;
             color: #333;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 600;
         }
         
         .quotes-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 150px;
+            gap: 8px;
+            max-height: 120px;
             overflow-y: auto;
         }
         
         .quote-option {
-            padding: 12px;
+            padding: 10px 12px;
             background: #f8f9fa;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 13px;
             color: #333;
             cursor: pointer;
             transition: all 0.2s;
@@ -295,24 +147,22 @@
         .quote-option small {
             display: block;
             color: #999;
-            margin-top: 5px;
-            font-size: 12px;
+            margin-top: 4px;
+            font-size: 11px;
         }
         
         /* 底部按钮 */
         .bottom-bar {
-            position: sticky;
-            bottom: 15px;
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
         
         .btn {
             flex: 1;
-            padding: 15px;
+            padding: 14px;
             border: none;
-            border-radius: 14px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -321,50 +171,25 @@
         .btn-download {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
         }
         
         .btn-download:active {
             transform: scale(0.98);
         }
         
-        .btn-back {
+        .btn-reset {
             background: #f0f0f0;
-            color: #333;
-        }
-        
-        /* 返回链接 */
-        .back-link {
-            display: inline-block;
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        
-        /* 提示文字 */
-        .hint-text {
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-            margin-top: 10px;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="back-link">← 返回语录</a>
-        
         <div class="header">
-            <h1>大德语录卡片</h1>
-        </div>
-        
-        <!-- 工具栏 -->
-        <div class="toolbar">
-            <div class="tool-btn" id="editTextBtn">✏️ 编辑文字</div>
-            <div class="tool-btn" id="resetBtn">🔄 重置</div>
-            <div class="tool-btn" id="deleteBtn">🗑️ 删除</div>
+            <a href="index.html" class="back-link">← 返回</a>
+            <h1>语录卡片</h1>
+            <div style="width:40px"></div>
         </div>
         
         <!-- 模板选择 -->
@@ -381,50 +206,19 @@
             <div id="canvas-container">
                 <canvas id="canvas"></canvas>
             </div>
-            <p class="hint-text">💡 点击文字可拖拽、缩放</p>
+            <p class="hint-text">💡 双击文字可编辑，拖动可移动/缩放</p>
         </div>
         
         <!-- 语录选择 -->
         <div class="quotes-section">
-            <h3>💡 选择语录</h3>
-            <div class="quotes-list" id="quotesList">
-                <!-- 语录会动态加载 -->
-            </div>
+            <h3>选择语录</h3>
+            <div class="quotes-list" id="quotesList"></div>
         </div>
         
         <!-- 底部按钮 -->
         <div class="bottom-bar">
-            <a href="index.html" class="btn btn-back" style="text-align: center; text-decoration: none; display: block;">返回</a>
-            <button class="btn btn-download" id="downloadBtn">📥 保存图片</button>
-        </div>
-    </div>
-    
-    <!-- 编辑弹窗 -->
-    <div class="edit-modal" id="editModal">
-        <div class="edit-panel">
-            <h3>编辑文字</h3>
-            <div class="edit-section">
-                <label>语录内容</label>
-                <textarea id="editTextInput">阿弥陀佛，佛光普照</textarea>
-            </div>
-            <div class="edit-section">
-                <label>字体大小: <span id="sizeValue">36</span>px</label>
-                <input type="range" id="editSizeInput" min="20" max="60" value="36">
-            </div>
-            <div class="edit-section">
-                <label>文字颜色</label>
-                <div class="color-options">
-                    <div class="color-option active" style="background: #333" data-color="#333"></div>
-                    <div class="color-option" style="background: #667eea" data-color="#667eea"></div>
-                    <div class="color-option" style="background: #fff; border: 1px solid #eee;" data-color="#fff"></div>
-                    <div class="color-option" style="background: #8b4513" data-color="#8b4513"></div>
-                    <div class="color-option" style="background: #ff6b6b" data-color="#ff6b6b"></div>
-                </div>
-            </div>
-            <div class="edit-buttons">
-                <button class="btn btn-cancel" id="cancelEdit">取消</button>
-                <button class="btn btn-confirm" id="confirmEdit">确定</button>
-            </div>
+            <button class="btn btn-reset" id="resetBtn">重置</button>
+            <button class="btn btn-download" id="downloadBtn">保存图片</button>
         </div>
     </div>
     
@@ -433,18 +227,15 @@
         let quoteTextObj;
         let quoteAuthorObj;
         let currentTemplate = 'classic';
-        let currentColor = '#333';
         
-        // 模板配置
         const templates = {
-            classic: { bgColor: '#fdfbf7' },
-            modern: { bgColor: '#667eea' },
-            zen: { bgColor: '#e8e0d5' },
-            warm: { bgColor: '#fff5eb' },
-            dark: { bgColor: '#2c3e50' }
+            classic: { bgColor: '#fdfbf7', textColor: '#333', authorColor: '#666' },
+            modern: { bgColor: '#667eea', textColor: '#fff', authorColor: 'rgba(255,255,255,0.8)' },
+            zen: { bgColor: '#e8e0d5', textColor: '#4a4035', authorColor: 'rgba(74,64,53,0.6)' },
+            warm: { bgColor: '#fff5eb', textColor: '#7a4a2a', authorColor: '#a67c52' },
+            dark: { bgColor: '#2c3e50', textColor: '#fff', authorColor: 'rgba(255,255,255,0.8)' }
         };
         
-        // 初始化画布
         function initCanvas() {
             const container = document.getElementById('canvas-container');
             const width = container.clientWidth;
@@ -456,12 +247,11 @@
                 backgroundColor: templates.classic.bgColor
             });
             
-            // 创建语录文字
             quoteTextObj = new fabric.IText('阿弥陀佛，佛光普照', {
-                left: 30,
+                left: 25,
                 top: height * 0.3,
-                fontSize: 36,
-                fill: '#333',
+                fontSize: 34,
+                fill: templates.classic.textColor,
                 textAlign: 'center',
                 fontFamily: '"Noto Serif SC", serif',
                 selectable: true,
@@ -469,12 +259,11 @@
                 lineHeight: 1.6
             });
             
-            // 创建作者文字
             quoteAuthorObj = new fabric.IText('— 大德语录', {
-                left: width - 120,
-                top: height - 80,
-                fontSize: 20,
-                fill: '#666',
+                left: width - 110,
+                top: height - 70,
+                fontSize: 18,
+                fill: templates.classic.authorColor,
                 textAlign: 'right',
                 selectable: true,
                 editable: true,
@@ -483,83 +272,22 @@
             
             canvas.add(quoteTextObj);
             canvas.add(quoteAuthorObj);
-            canvas.setActiveObject(quoteTextObj);
         }
         
-        // 应用模板
         document.querySelectorAll('.template-item').forEach(item => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
                 currentTemplate = item.dataset.template;
+                const t = templates[currentTemplate];
                 
-                canvas.setBackgroundColor(templates[currentTemplate].bgColor, canvas.renderAll.bind(canvas));
-                
-                // 根据模板调整文字颜色
-                if (currentTemplate === 'modern' || currentTemplate === 'dark') {
-                    quoteTextObj.set('fill', '#fff');
-                    quoteAuthorObj.set('fill', 'rgba(255,255,255,0.8)');
-                } else if (currentTemplate === 'warm') {
-                    quoteTextObj.set('fill', '#7a4a2a');
-                    quoteAuthorObj.set('fill', '#a67c52');
-                } else if (currentTemplate === 'zen') {
-                    quoteTextObj.set('fill', '#4a4035');
-                    quoteAuthorObj.set('fill', 'rgba(74,64,53,0.6)');
-                } else {
-                    quoteTextObj.set('fill', '#333');
-                    quoteAuthorObj.set('fill', '#666');
-                }
-                
+                canvas.setBackgroundColor(t.bgColor, canvas.renderAll.bind(canvas));
+                quoteTextObj.set('fill', t.textColor);
+                quoteAuthorObj.set('fill', t.authorColor);
                 canvas.renderAll();
             });
         });
         
-        // 编辑按钮
-        document.getElementById('editTextBtn').addEventListener('click', () => {
-            const activeObj = canvas.getActiveObject();
-            if (activeObj && (activeObj === quoteTextObj || activeObj === quoteAuthorObj)) {
-                document.getElementById('editTextInput').value = activeObj.text;
-                document.getElementById('editSizeInput').value = activeObj.fontSize;
-                document.getElementById('sizeValue').textContent = activeObj.fontSize;
-                document.getElementById('editModal').classList.add('show');
-            } else {
-                alert('请先点击选中要编辑的文字');
-                canvas.setActiveObject(quoteTextObj);
-            }
-        });
-        
-        // 字体大小
-        document.getElementById('editSizeInput').addEventListener('input', (e) => {
-            document.getElementById('sizeValue').textContent = e.target.value;
-        });
-        
-        // 颜色选择
-        document.querySelectorAll('.color-option').forEach(option => {
-            option.addEventListener('click', () => {
-                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('active'));
-                option.classList.add('active');
-                currentColor = option.dataset.color;
-            });
-        });
-        
-        // 确认编辑
-        document.getElementById('confirmEdit').addEventListener('click', () => {
-            const activeObj = canvas.getActiveObject();
-            if (activeObj) {
-                activeObj.setText(document.getElementById('editTextInput').value);
-                activeObj.set('fontSize', parseInt(document.getElementById('editSizeInput').value));
-                activeObj.set('fill', currentColor);
-                canvas.renderAll();
-            }
-            document.getElementById('editModal').classList.remove('show');
-        });
-        
-        // 取消编辑
-        document.getElementById('cancelEdit').addEventListener('click', () => {
-            document.getElementById('editModal').classList.remove('show');
-        });
-        
-        // 重置画布
         document.getElementById('resetBtn').addEventListener('click', () => {
             if (confirm('确定要重置吗？')) {
                 canvas.clear();
@@ -568,32 +296,16 @@
             }
         });
         
-        // 删除选中
-        document.getElementById('deleteBtn').addEventListener('click', () => {
-            const activeObj = canvas.getActiveObject();
-            if (activeObj) {
-                canvas.remove(activeObj);
-            }
-        });
-        
-        // 下载图片
         document.getElementById('downloadBtn').addEventListener('click', () => {
-            // 先取消选中
             canvas.discardActiveObject();
             canvas.renderAll();
-            
-            const dataURL = canvas.toDataURL({
-                format: 'png',
-                quality: 1
-            });
-            
+            const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
             const link = document.createElement('a');
             link.download = `大德语录_${Date.now()}.png`;
             link.href = dataURL;
             link.click();
         });
         
-        // 加载语录
         async function loadQuotes() {
             const teachers = ['印光大师', '净空法师', '其他大德'];
             const allQuotes = [];
@@ -602,16 +314,12 @@
                 try {
                     const response = await fetch(`${teacher}.txt`);
                     const text = await response.text();
-                    const lines = text.trim().split('\n').filter(line => line.trim());
-                    lines.forEach(line => {
+                    text.trim().split('\n').filter(line => line.trim()).forEach(line => {
                         allQuotes.push({ text: line.trim(), teacher: teacher });
                     });
-                } catch (e) {
-                    console.log(`加载 ${teacher} 失败`);
-                }
+                } catch (e) {}
             }
             
-            // 显示语录
             const list = document.getElementById('quotesList');
             allQuotes.forEach(quote => {
                 const item = document.createElement('div');
@@ -626,7 +334,6 @@
             });
         }
         
-        // 初始化
         initCanvas();
         loadQuotes();
     </script>
